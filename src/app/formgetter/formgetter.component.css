@@ -1,0 +1,22 @@
+.inputField{
+    display: block;
+    max-width: 30%;
+    margin: auto;
+}
+#searchBtn{
+    float: right;
+    padding: 0px;
+    margin-top: -45px;
+    cursor: pointer;
+    margin-right: 70px;
+}
+label{
+    display: block;
+}
+#individualQueDiv{
+    margin-bottom: 20px ;
+}
+#btnSaveForm{
+    float: right;
+    margin: 5%;
+}

@@ -1,0 +1,99 @@
+<mat-form-field class="inputField">
+  <input matInput type="text" placeholder="form  name" id='formName'>
+  <button mat-button   matSuffix mat-icon-button class="material-icons" (click)="getForm()">
+    <mat-icon>search</mat-icon>
+  </button>
+</mat-form-field>
+
+
+<div *ngIf='gotDataFlag' >
+   
+    <button id="btnAddQue" mat-raised-button color="primary" (click)="addQuestion()">Add Question</button>
+    
+    <label for="formTitle">Title</label>
+    <mat-form-field>
+       <input matInput  placeholder="{{FormData.formTitle}}" type="text" name="formTitle" id="formTitle"> 
+   </mat-form-field>
+    <label for="formDescription">Description</label>
+    <mat-form-field>
+    <input matInput  placeholder="{{FormData.formDescription}}" type="text" name="formDescription" id="formDescription"> 
+   </mat-form-field>
+
+    <form id="oldForm" [formGroup]='oldFormInfo'>
+  <div id="individualQueDiv"   [ngSwitch]='question.qType' *ngFor='let question of FormData.QuestionsArray' >
+        <mat-card  *ngSwitchCase='"shortAnswer"' >
+                <mat-card-title>Question</mat-card-title>
+                 <mat-form-field>
+        <input id='{{question.qNumber}}' value='{{question.question}}' type="text" name='question.qNumber' matInput>
+          </mat-form-field>
+          <mat-form-field>
+            <input disabled matInput type="text" name="shortAnswer" placeholder="your answer here">
+          </mat-form-field>
+        </mat-card> 
+        <mat-card  *ngSwitchCase='"longAnswer"' >
+                <mat-card-title>Question</mat-card-title>
+            <input id='{{question.qNumber}}' value='{{question.question}}' type="text" name='question.qNumber' matInput>
+            <textarea name="something" id="nothing" cols="30" rows="5" disabled matInput placeholder="your answer here" ></textarea>
+        </mat-card>  
+       
+        <mat-card  *ngSwitchCase='"multipleChoice"' >
+                <mat-card-title>Question</mat-card-title>
+            <input id='{{question.qNumber}}' value='{{question.question}}' type="text" name='question.qNumber' matInput>           
+            <div *ngFor='let subQue of question.subQuestions; index as subQIndex' >
+                    <i class="material-icons"> radio_button_unchecked </i>
+            <input id='SUBQ-{{subQIndex}}' value='{{subQue}}' type="text" name='question.qNumber' matInput>            
+            <i class="material-icons">remove_circle_outline</i>
+                  </div>
+             
+        </mat-card> 
+        <mat-card  *ngSwitchCase='"date"' >
+                <mat-card-title>Question</mat-card-title>
+            <mat-form-field>
+            <input  id='{{question.qNumber}}' matInput type="text" name="date"  value="{{question.question}}" id="date">
+            </mat-form-field>            
+            <mat-icon matSuffix>date_range</mat-icon>
+        </mat-card>   
+        <mat-card  *ngSwitchCase='"time"' >
+            <mat-card-title>Question</mat-card-title>
+            <mat-form-field>
+                 <input id='{{question.qNumber}}'  matInput value="{{question.question}}" type="text" name="SUBQ-{{subQIndex}}" >
+            </mat-form-field>
+            <mat-icon matSuffix>access_time</mat-icon>
+        </mat-card>   
+       <mat-card   *ngSwitchCase='"checkbox"'>
+            <mat-card-title>Question</mat-card-title>
+            <mat-form-field>
+                    <input id='{{question.qNumber}}' matInput value="{{question.question}}" type="text" name="SUBQ-{{subQIndex}}">
+               </mat-form-field>
+               <div  *ngFor='let subQue of question.subQuestions; index as subQIndex' >
+                    <i class="material-icons"> check_box_outline_blank</i>    
+                <input id='SUBQ-{{subQIndex}}' matInput value="{{subQue}}" type="TEXT" name="SUBQ-{{subQIndex}}" >                   
+                    <i class="material-icons">remove_circle_outline</i>
+                </div>
+
+        </mat-card>
+        <mat-card  *ngSwitchCase='"dropdown"' >       
+                <mat-card-title>Question</mat-card-title>
+                <mat-form-field>
+                        <input id='{{question.qNumber}}' matInput value="{{question.question}}" type="text" name="{{question.qNumber}}">
+                   </mat-form-field>
+                   <div  *ngFor='let subQue of question.subQuestions; index as subQIndex' >   
+                    <input id='SUBQ-{{subQIndex}}' matInput value="{{subQue}}" type="TEXT" name="SUBQ-{{subQIndex}}" >                   
+                        <i class="material-icons">remove_circle_outline</i>
+                    </div>
+        </mat-card>
+        <mat-card   *ngSwitchCase='"uploadFile"' >
+            <mat-card-title>Question</mat-card-title>
+            <input id='{{question.qNumber}}' matInput value="{{question.question}}" type="text" name="{{question.qNumber}}">
+            <mat-icon>cloud_upload</mat-icon> 
+        </mat-card>
+
+  </div>
+</form>
+
+<button mat-raised-button color="accent" class='btn-save' (click)='saveForm()' >Save Form</button>
+
+</div>
+<form id="Qform" [formGroup]='newFormInfo'>
+
+    </form>

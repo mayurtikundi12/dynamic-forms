@@ -1,0 +1,63 @@
+<mat-form-field class="inputField">
+    <input matInput type="text" placeholder="form  name" id='formName'>
+    <button mat-button  matSuffix mat-icon-button class="material-icons" (click)="getForm()">
+      <mat-icon>search</mat-icon>
+    </button>
+  </mat-form-field>
+
+
+  <div *ngIf='gotDataFlag' >
+
+<form [formGroup]='AnsForm' >
+
+  <h2>{{FormData.formTitle}}</h2>
+  <h3>{{FormData.formDescription}}</h3>
+  <div id="questionsDiv" *ngFor='let question of FormData.QuestionsArray ; index as ansIndex' >
+    <div id="individualQueDiv"  [ngSwitch]='question.qType' >
+        <mat-card id='{{question.qNumber}}' *ngSwitchCase='"shortAnswer"' >
+          <mat-card-title>{{question.question}}</mat-card-title>
+          <mat-form-field>
+            <input id="ANS-{{ansIndex}}"  formControlName="ANS-{{ansIndex}}" type="text" name='que1' matInput placeholder='{{question.question}}'>
+          </mat-form-field>
+        </mat-card> 
+        <mat-card id='{{question.qNumber}}'  *ngSwitchCase='"longAnswer"' >
+            <mat-card-title>{{question.question}}</mat-card-title>
+            <textarea formControlName="ANS-{{ansIndex}}" id="ANS-{{ansIndex}}" name="something" id="nothing" cols="30" rows="5" matInput placeholder="your answer here" ></textarea>
+        </mat-card>  
+        <mat-card id='{{question.qNumber}}'  *ngSwitchCase='"multipleChoice"' >
+            <mat-card-title>{{question.question}}</mat-card-title> 
+            <mat-radio-group formControlName="ANS-{{ansIndex}}" id="ANS-{{ansIndex}}"  >
+                <mat-radio-button *ngFor='let subQue of question.subQuestions'value='{{subQue}}'>{{subQue}}</mat-radio-button>
+              </mat-radio-group> 
+        </mat-card> 
+        <mat-card id='{{question.qNumber}}'  *ngSwitchCase='"date"' >
+            <mat-card-title>{{question.question}}</mat-card-title>
+            <input formControlName="ANS-{{ansIndex}}" id="ANS-{{ansIndex}}"  matInput type="date" name="date" placeholder="date" id="date">
+            <mat-icon matSuffix>date_range</mat-icon>
+        </mat-card>   
+        <mat-card id='{{question.qNumber}}'  *ngSwitchCase='"time"' >
+            <mat-card-title>{{question.question}}</mat-card-title>
+            <input formControlName="ANS-{{ansIndex}}" id="ANS-{{ansIndex}}"  matInput type="time" name="time" id="time">
+            <mat-icon matSuffix>access_time</mat-icon>
+        </mat-card>   
+       <mat-card id='{{question.qNumber}}'  *ngSwitchCase='"checkbox"'>
+          <mat-card-title>{{question.question}}</mat-card-title>
+          <mat-checkbox formControlName="SANS-{{ansIndex}}-{{subQueIndex}}" id="ANS-{{ansIndex}}-{{subQueIndex}}"  *ngFor='let subQue of question.subQuestions; index as subQueIndex'value='{{subQue}}'  >{{subQue}}</mat-checkbox>
+        </mat-card>
+        <mat-card id='{{question.qNumber}}'  *ngSwitchCase='"dropdown"' >       
+            <mat-card-title>{{question.question}}</mat-card-title>
+            <mat-select formControlName="ANS-{{ansIndex}}" id="ANS-{{ansIndex}}" placeholder="choose any one">
+              <mat-option *ngFor='let subQue of question.subQuestions' value='{{subQue}}' >{{subQue}}</mat-option>
+            </mat-select>
+        </mat-card>
+        <mat-card id='{{question.qNumber}}'  *ngSwitchCase='"uploadFile"' >
+            <mat-card-title>{{question.question}}</mat-card-title>
+            <input formControlName="ANS-{{ansIndex}}" id="ANS-{{ansIndex}}" type="file" name="upload" hidden id="uploadFile" click="show()" #inputval>
+            <mat-icon matSuffix (click)="inputval.click()">cloud_upload</mat-icon> 
+        </mat-card>
+    </div>
+  </div>
+  <button id="btnSaveForm" (click)='saveUserForm()' mat-raised-button color="primary">Save & Proceed</button>
+
+</form>
+</div>

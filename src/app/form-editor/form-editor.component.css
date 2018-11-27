@@ -1,0 +1,69 @@
+.inputField{
+    display: block;
+    max-width: 30%;
+    margin: auto;
+}
+#searchBtn{
+    float: right;
+    padding: 0px;
+    margin-top: -45px;
+    cursor: pointer;
+    margin-right: 70px;
+}
+label{
+    display: block;
+}
+#individualQueDiv{
+    margin-bottom: 20px ;
+}
+#btnSaveForm{
+    float: right;
+    margin: 5%;
+}
+.btn-save{
+    float: right;
+    margin: 5%;   
+}
+input{
+    width: 90%;
+}
+
+*{
+    margin: 1% ;
+    padding: 0.5% ; 
+    display: block;
+    }
+    
+    #btnAddQue{
+    background-color: blue ;
+    color: aliceblue ;
+    position: fixed;
+    z-index: 1;
+    }
+    .formFields{
+        display: block;
+    }
+    
+    .question{
+        background-color: aquamarine ;
+        color: white ;
+        border-radius: 5px ;
+        border: 2px solid red ;
+    }
+    .multipleChoice{
+        display: inline-block;
+    }
+    .material-icons{
+        cursor:pointer ;
+        display: inline;
+    }
+    
+    .deleteIcon{
+        float: right;
+    }
+    .btn-save{
+        margin-bottom: 2% ;
+        float: right;
+        margin-right: 4% ;
+    }
+    
