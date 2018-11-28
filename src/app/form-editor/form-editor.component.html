@@ -20,8 +20,9 @@
    </mat-form-field>
 
     <form id="oldForm" [formGroup]='oldFormInfo'>
-  <div id="individualQueDiv"   [ngSwitch]='question.qType' *ngFor='let question of FormData.QuestionsArray' >
+  <div id="Q-{{question.queNum}}"   [ngSwitch]='question.qType' *ngFor='let question of FormData.QuestionsArray' >
         <mat-card  *ngSwitchCase='"shortAnswer"' >
+                <i class="material-icons deleteIcon" id="delQ-{{question.queNum}}" (click)='deleteQueDiv(question.queNum)'> delete </i>
                 <mat-card-title>Question</mat-card-title>
                  <mat-form-field>
         <input id='{{question.qNumber}}' value='{{question.question}}' type="text" name='question.qNumber' matInput>
@@ -31,12 +32,14 @@
           </mat-form-field>
         </mat-card> 
         <mat-card  *ngSwitchCase='"longAnswer"' >
+                <i class="material-icons deleteIcon" id="delQ-{{question.queNum}}" (click)='deleteQueDiv(question.queNum)'> delete </i>
                 <mat-card-title>Question</mat-card-title>
             <input id='{{question.qNumber}}' value='{{question.question}}' type="text" name='question.qNumber' matInput>
             <textarea name="something" id="nothing" cols="30" rows="5" disabled matInput placeholder="your answer here" ></textarea>
         </mat-card>  
        
         <mat-card  *ngSwitchCase='"multipleChoice"' >
+                <i class="material-icons deleteIcon" id="delQ-{{question.queNum}}" (click)='deleteQueDiv(question.queNum)'> delete </i>
                 <mat-card-title>Question</mat-card-title>
             <input id='{{question.qNumber}}' value='{{question.question}}' type="text" name='question.qNumber' matInput>           
             <div *ngFor='let subQue of question.subQuestions; index as subQIndex' >
@@ -44,9 +47,11 @@
             <input id='SUBQ-{{subQIndex}}' value='{{subQue}}' type="text" name='question.qNumber' matInput>            
             <i class="material-icons">remove_circle_outline</i>
                   </div>
+            <i class="material-icons" (click)="insertOption('multipleChoice')">add_circle</i>
              
         </mat-card> 
         <mat-card  *ngSwitchCase='"date"' >
+                <i class="material-icons deleteIcon" id="delQ-{{question.queNum}}" (click)='deleteQueDiv(question.queNum)'> delete </i>
                 <mat-card-title>Question</mat-card-title>
             <mat-form-field>
             <input  id='{{question.qNumber}}' matInput type="text" name="date"  value="{{question.question}}" id="date">
@@ -54,6 +59,7 @@
             <mat-icon matSuffix>date_range</mat-icon>
         </mat-card>   
         <mat-card  *ngSwitchCase='"time"' >
+                <i class="material-icons deleteIcon" id="delQ-{{question.queNum}}" (click)='deleteQueDiv(question.queNum)'> delete </i>
             <mat-card-title>Question</mat-card-title>
             <mat-form-field>
                  <input id='{{question.qNumber}}'  matInput value="{{question.question}}" type="text" name="SUBQ-{{subQIndex}}" >
@@ -61,6 +67,7 @@
             <mat-icon matSuffix>access_time</mat-icon>
         </mat-card>   
        <mat-card   *ngSwitchCase='"checkbox"'>
+            <i class="material-icons deleteIcon" id="delQ-{{question.queNum}}" (click)='deleteQueDiv(question.queNum)'> delete </i>
             <mat-card-title>Question</mat-card-title>
             <mat-form-field>
                     <input id='{{question.qNumber}}' matInput value="{{question.question}}" type="text" name="SUBQ-{{subQIndex}}">
@@ -70,9 +77,10 @@
                 <input id='SUBQ-{{subQIndex}}' matInput value="{{subQue}}" type="TEXT" name="SUBQ-{{subQIndex}}" >                   
                     <i class="material-icons">remove_circle_outline</i>
                 </div>
-
+                <i class="material-icons" (click)="insertOption('multipleChoice')">add_circle</i>
         </mat-card>
         <mat-card  *ngSwitchCase='"dropdown"' >       
+                <i class="material-icons deleteIcon" id="delQ-{{question.queNum}}" (click)='deleteQueDiv(question.queNum)'> delete </i>
                 <mat-card-title>Question</mat-card-title>
                 <mat-form-field>
                         <input id='{{question.qNumber}}' matInput value="{{question.question}}" type="text" name="{{question.qNumber}}">
@@ -81,8 +89,13 @@
                     <input id='SUBQ-{{subQIndex}}' matInput value="{{subQue}}" type="TEXT" name="SUBQ-{{subQIndex}}" >                   
                         <i class="material-icons">remove_circle_outline</i>
                     </div>
+                    <div>
+                            <i class="material-icons" (click)="insertOption('multipleChoice')">add_circle</i>
+                            <span> add another option </span>
+                    </div>
         </mat-card>
         <mat-card   *ngSwitchCase='"uploadFile"' >
+            <i class="material-icons deleteIcon" id="delQ-{{question.queNum}}" (click)='deleteQueDiv(question.queNum)'> delete </i>
             <mat-card-title>Question</mat-card-title>
             <input id='{{question.qNumber}}' matInput value="{{question.question}}" type="text" name="{{question.qNumber}}">
             <mat-icon>cloud_upload</mat-icon> 
@@ -90,10 +103,9 @@
 
   </div>
 </form>
+<form id="Qform" [formGroup]='newFormInfo'>
 
+</form>
 <button mat-raised-button color="accent" class='btn-save' (click)='saveForm()' >Save Form</button>
 
 </div>
-<form id="Qform" [formGroup]='newFormInfo'>
-
-    </form>

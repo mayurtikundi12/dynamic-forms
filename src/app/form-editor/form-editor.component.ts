@@ -33,7 +33,6 @@ export class FormEditorComponent implements OnInit {
   getForm() {
     let formName = this.element.nativeElement.querySelector('#formName')
     formName = formName.value;
-    console.log(formName);
 
     if (formName) {
       this.formService.getForm(formName).subscribe(data => {
@@ -51,25 +50,28 @@ export class FormEditorComponent implements OnInit {
           for (let ref of data.payload.response.QuestionsArray) {
             this.QuestionsArray.push(ref);
           }
-          console.log("bsjhcb", this.QuestionsArray);
 
           this.oldFormData = oldQuestionArray
           let questionCountText = oldQuestionArray[oldQuestionArray.length - 1]['qNumber']
-          console.log("=====>>", questionCountText);
           this.questionCount = Number(questionCountText.substr(5, questionCountText.length)) + 1
-          console.log("<<=====", this.questionCount);
 
           let question;
           let quesType;
-          console.log('this is the questions array', this.QuestionsArray);
-          console.log('this is the old questions array', this.oldFormData);
-
           //for questions having subQues updating the subQuestoins object
           for (const index in this.FormData['QuestionsArray']) {
+
+            //getting the question number and pushing it to the questionNumberText 
+            let questionNumText = this.FormData['QuestionsArray'][index]['qNumber']
+             questionNumText = Number(questionNumText.substr(5,questionNumText.length)) ;
+            //creating a question field field and putting the value for it 
+            this.FormData['QuestionsArray'][index]['queNum'] = questionNumText ;
+            
+            
+            //checking for the question type
             question = this.FormData['QuestionsArray'][index]
             quesType = question['qType']
             if (quesType == 'checkbox' || quesType == 'dropdown' || quesType == 'multipleChoice') {
-              this.subQuestions[index] = question['subQuestions'].length
+              this.subQuestions[questionNumText] = question['subQuestions'].length ;
             }
           }
         } else {
@@ -78,6 +80,8 @@ export class FormEditorComponent implements OnInit {
             text: 'Form not found'
           })
         }
+console.log(this.QuestionsArray);
+console.log(this.subQuestions);
 
       });
     }
@@ -86,7 +90,8 @@ export class FormEditorComponent implements OnInit {
   questionCount: number = 1;
   questionInput = '';
   QuestionsArray = [];
-  totalSubQuestionCount = {}
+  totalSubQuestionCount = {};
+
 
   finalFormData = {
     formTitle: '',
@@ -110,10 +115,6 @@ export class FormEditorComponent implements OnInit {
     //pushing the question object in the QuestionsArray
     this.QuestionsArray.push(questionObj)
     this.renderer.setAttribute(element, 'id', 'QDiv-' + count);
-    console.log(this.QuestionsArray);
-    console.log("hail", this.oldFormData);
-
-
   }
 
   addQuestion() {
@@ -269,6 +270,8 @@ export class FormEditorComponent implements OnInit {
   }
 
   createAnsType(parentNode, QueType) {
+    console.log("this is the parent node",parentNode);
+    
     //first remove all the existing children if already made
     let questionNumber = parentNode.id;
     questionNumber = questionNumber.substring(2, questionNumber.length)
@@ -566,5 +569,35 @@ export class FormEditorComponent implements OnInit {
     });
   }
 
+
+
+
+//----------------------------------------------------------this  portion (below) is only for the old form
+
+
+
+
+
+
+
+  //deleting the existing question divs
+  deleteQueDiv(qnum){
+    
+    //first getting the id then getting the main element + getting the question div
+    let oldForm = this.element.nativeElement.querySelector('#oldForm');
+    let questionDivText = '#Q-'+qnum
+    let questionDiv = this.element.nativeElement.querySelector(questionDivText)
+
+    //removing the question from the questions array
+    for (const index in this.QuestionsArray) {
+      if (this.QuestionsArray[index].queNum == qnum) {
+        this.QuestionsArray.splice(Number(index),1)
+        //removing the subquestion from the subquestions array 
+        delete this.subQuestions[qnum]
+        break ;
+      }
+    }
+    this.renderer.removeChild(oldForm,questionDiv);
+  }
 
 }
