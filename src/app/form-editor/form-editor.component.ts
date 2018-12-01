@@ -71,6 +71,7 @@ export class FormEditorComponent implements OnInit {
             question = this.FormData['QuestionsArray'][index]
             quesType = question['qType']
             if (quesType == 'checkbox' || quesType == 'dropdown' || quesType == 'multipleChoice') {
+              this.totalSubQuestionCount[questionNumText] = question['subQuestions'].length ;
               this.subQuestions[questionNumText] = question['subQuestions'].length ;
             }
           }
@@ -80,9 +81,6 @@ export class FormEditorComponent implements OnInit {
             text: 'Form not found'
           })
         }
-console.log(this.QuestionsArray);
-console.log(this.subQuestions);
-
       });
     }
   }
@@ -275,7 +273,6 @@ console.log(this.subQuestions);
     //first remove all the existing children if already made
     let questionNumber = parentNode.id;
     questionNumber = questionNumber.substring(2, questionNumber.length)
-    console.log("this subquestions object ", this.subQuestions);
 
     for (const index in parentNode.children) {
       if (Number(index) > 2) {
@@ -402,16 +399,18 @@ console.log(this.subQuestions);
   //function to create dynamic multiple choice question and checkboxes
   addAnotherOption(parentNode, oldChild, flag, icon, questionNumber) {
     //adding the main question number to the option and then we will increment the subqestion number
-
     if (this.subQuestions.hasOwnProperty(questionNumber)) {
-      let subQueNumber = this.subQuestions[questionNumber];
+      let subQueNumber = Number(this.subQuestions[questionNumber]);
       subQueNumber++;
       this.subQuestions[questionNumber] = subQueNumber;
 
       //incrementing the number of options in totalSubQuestionCount
-      let subQueCounts = this.totalSubQuestionCount[questionNumber];
+      let subQueCounts:number = Number(this.totalSubQuestionCount[questionNumber]);
+      // console.log('current subQcount is ',subQueCounts);
       subQueCounts++;
       this.totalSubQuestionCount[questionNumber] = subQueCounts
+      // console.log('current subQcount is ',subQueCounts);
+      
     } else {
       this.subQuestions[questionNumber] = 1;
       //assigning value as 1 for the totalSubQuestionCount for the first time
@@ -424,7 +423,7 @@ console.log(this.subQuestions);
     let iconText = this.renderer.createText(icon);
     this.renderer.appendChild(multipleChoiceIcon, iconText)
 
-    //creating the input for the multiple choice
+    //creating the input for the multiple choice and checkbox
     let multipleChoiceInput = this.createElementAndAddClass('input', ['multipleChoice']);
     this.renderer.setAttribute(multipleChoiceInput, 'placeholder', 'your Option');
     this.renderer.setAttribute(multipleChoiceInput, 'id', 'SubQ-' + questionNumber + '-' + this.subQuestions[questionNumber])
@@ -440,11 +439,9 @@ console.log(this.subQuestions);
     //listening to the remove icon to remove the option
     this.renderer.listen(removeOptionIcon, 'click', event => {
       this.renderer.removeChild(parentNode, multiChoiceDiv);
-      let subQuestionCount = this.totalSubQuestionCount[questionNumber];
+      let subQuestionCount:number = Number(this.totalSubQuestionCount[questionNumber]);
       subQuestionCount--;
-      this.totalSubQuestionCount[questionNumber] = Number(subQuestionCount);
-      console.log(this.totalSubQuestionCount);
-
+      this.totalSubQuestionCount[questionNumber] = subQuestionCount;
     })
 
     if (flag) {
@@ -463,7 +460,7 @@ console.log(this.subQuestions);
       subQueNuber++;
       this.subQuestions[questionNumber] = subQueNuber;
       //incrementing the number of options in totalSubQuestionCount
-      let subQueCounts = this.totalSubQuestionCount[questionNumber];
+      let subQueCounts:number = Number(this.totalSubQuestionCount[questionNumber]);
       subQueCounts++;
       this.totalSubQuestionCount[questionNumber] = subQueCounts
     } else {
@@ -487,10 +484,9 @@ console.log(this.subQuestions);
     this.renderer.listen(removeBtn, 'click', event => {
       this.renderer.removeChild(parentNode, dropDownDiv);
       //decrementing the totalSubQuestionCount value as the input is removed
-      let subQuestionCount = this.totalSubQuestionCount[questionNumber];
+      let subQuestionCount:number = Number(this.totalSubQuestionCount[questionNumber]);
       subQuestionCount--;
       this.totalSubQuestionCount[questionNumber] = Number(subQuestionCount);
-      console.log(this.totalSubQuestionCount);
     })
 
 
@@ -521,8 +517,10 @@ console.log(this.subQuestions);
     this.finalFormData['formTitle'] = formTitle.value;
     this.finalFormData['formDescription'] = formDescription.value;
     let mainQuestion;
-
+ 
     for (const index in this.QuestionsArray) {
+          //making the subQuestions empty first to avoid sub questions duplication
+          this.QuestionsArray[index]['subQuestions'] = []
       let currentQuestion = this.QuestionsArray[index];
       mainQuestion = this.element.nativeElement.querySelector('#' + this.QuestionsArray[index]['qNumber']);
       currentQuestion['question'] = mainQuestion.value
@@ -536,21 +534,26 @@ console.log(this.subQuestions);
         let questionNumber = Number(questionNumberText.substring(5, questionNumberText.length))
 
         if (questionNumber != NaN) {
-          let subQueLimit = 0;
+          let subQueLimit = 1;
           let subQueNumber = 1;
-          while (subQueLimit != this.subQuestions[questionNumber]) {
+  console.log("this is subQuesyion ===>", Number(this.subQuestions[questionNumber]));
+  
+          while (subQueLimit <= Number(this.subQuestions[questionNumber]) && subQueNumber<=Number(this.subQuestions[questionNumber])) {
+           
             // now creating the id of the subquestions 
             let subQuestionNumber = '#SubQ-' + questionNumber + '-' + subQueNumber;
             //now getting the element
+            
             let subQueElementInp = this.element.nativeElement.querySelector(subQuestionNumber)
+            console.log('this is the element to find ',subQueElementInp);
             //now checking if the element is there if the value is not null the get the input fields value
-            if (subQueElementInp != null) {
+            if (subQueElementInp != null && subQueElementInp) {  
+             console.log('i am inside true condition');
               subQueLimit++;
               this.QuestionsArray[index]['subQuestions'].push(subQueElementInp.value)
-            }
-
-            if (subQueLimit == this.subQuestions[questionNumber]) {
-              break;
+            }else{
+              console.log('it was null');
+              // subQueLimit++;  
             }
             subQueNumber++;
           }
@@ -560,24 +563,21 @@ console.log(this.subQuestions);
 
       }
     }
+    console.log("this is the subquestions",this.subQuestions);
+    console.log("this is the totalSubquestionCount",this.totalSubQuestionCount);
+   
     this.finalFormData['QuestionsArray'] = this.QuestionsArray;
     console.log(this.finalFormData);
 
-    //sending and saving the file in the database
-    this.formService.setForm({ formData: this.finalFormData }).subscribe(data => {
-      console.log(data);
-    });
+    // sending and saving the file in the database
+    // this.formService.setForm({ formData: this.finalFormData }).subscribe(data => {
+    //   console.log(data);
+    // });
+    
   }
 
 
-
-
 //----------------------------------------------------------this  portion (below) is only for the old form
-
-
-
-
-
 
 
   //deleting the existing question divs
@@ -600,4 +600,30 @@ console.log(this.subQuestions);
     this.renderer.removeChild(oldForm,questionDiv);
   }
 
+ 
+  insertOldFormOption(event,type,questionNumber){
+    let targetNode = event.target ; 
+    let parentNode = this.renderer.parentNode(targetNode);
+    let grandParentNode = this.renderer.parentNode(parentNode)
+    questionNumber = Number(questionNumber)
+    if(type == 'checkbox'){
+      this.addAnotherOption(grandParentNode,parentNode,true,'check_box',questionNumber)
+    }else if(type == 'multipleChoice'){
+      this.addAnotherOption(grandParentNode,parentNode,true,'panorama_fish_eye',questionNumber)
+    }else if(type == 'dropdown'){
+      this.addDropdownOption(grandParentNode,parentNode,questionNumber)
+    }
+  }
+
+  removeOldFormOption(event,questionNumber){
+    //first decrementing the number of subquestions in the totalsubQuestions  object
+    let subQuestionCount = this.totalSubQuestionCount[questionNumber];
+    subQuestionCount--;
+    this.totalSubQuestionCount[questionNumber] = Number(subQuestionCount);
+
+    let targetNode = event.target ; 
+    let parentNode = this.renderer.parentNode(targetNode) ;
+    let grandParentNode = this.renderer.parentNode(parentNode);
+    this.renderer.removeChild(grandParentNode,parentNode)
+  }
 }

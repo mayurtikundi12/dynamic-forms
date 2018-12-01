@@ -296,7 +296,6 @@ export class FormsetterComponent implements OnInit {
             this.renderer.listen(addOptionBtnIcon,'click',event=>{
               this.addAnotherOption(parentNode,addOptionDiv,true,'check_box',localQuestionCount)
             })
-
     }
     else if(QueType == 'dropdown'){
       let localQuestionCount = this.questionCount-1 ;
@@ -326,6 +325,8 @@ export class FormsetterComponent implements OnInit {
       this.renderer.appendChild(parentNode,fileUploadDiv)
       
     }
+console.log('this is subQuestions',this.subQuestions);
+console.log('this is totalsubqCOUNT',this.totalSubQuestionCount)
   }
 
 
