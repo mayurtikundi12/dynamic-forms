@@ -1,14 +1,13 @@
 <mat-form-field class="inputField">
-    <input matInput type="text" placeholder="form  name" id='formName'>
+    <input (keydown.enter)="getForm()" matInput type="text" placeholder="form  name" id='formName'>
     <button mat-button  matSuffix mat-icon-button class="material-icons" (click)="getForm()">
       <mat-icon>search</mat-icon>
     </button>
   </mat-form-field>
 
-
   <div *ngIf='gotDataFlag' >
 
-<form [formGroup]='AnsForm' >
+<form [formGroup]='AnsForm' #formdata='ngForm'>
 
   <h2>{{FormData.formTitle}}</h2>
   <h3>{{FormData.formDescription}}</h3>
@@ -17,7 +16,7 @@
         <mat-card id='{{question.qNumber}}' *ngSwitchCase='"shortAnswer"' >
           <mat-card-title>{{question.question}}</mat-card-title>
           <mat-form-field>
-            <input id="ANS-{{ansIndex}}"  formControlName="ANS-{{ansIndex}}" type="text" name='que1' matInput placeholder='{{question.question}}'>
+            <input required id="ANS-{{ansIndex}}"  formControlName="ANS-{{ansIndex}}" type="text" name='que1' matInput placeholder='{{question.question}}'>
           </mat-form-field>
         </mat-card> 
         <mat-card id='{{question.qNumber}}'  *ngSwitchCase='"longAnswer"' >
@@ -57,7 +56,8 @@
         </mat-card>
     </div>
   </div>
-  <button id="btnSaveForm" (click)='saveUserForm()' mat-raised-button color="primary">Save & Proceed</button>
-
+  <button id="btnSaveForm" [disabled]="AnsForm.invalid" (click)='saveUserFormNew()' mat-raised-button color="primary">Save & Proceed</button>
+  <!-- <button id="btnSaveForm" (click)='saveUserForm()' mat-raised-button color="primary">Save & Proceed</button> -->
+  
 </form>
 </div>

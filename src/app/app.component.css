@@ -1,3 +1,4 @@
 a{
     margin: 5px ;
 }
+@import '~pretty-checkbox/src/pretty-checkbox.scss';

@@ -10,6 +10,8 @@ import {MatRadioModule,MatButtonModule,MatIconModule,MatCardModule,MatInputModul
 import {HttpClientModule} from '@angular/common/http';
 import { FormgetterComponent } from './formgetter/formgetter.component';
 import { FormEditorComponent } from './form-editor/form-editor.component'
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import { NotifierModule } from 'angular-notifier';
 
 @NgModule({
   declarations: [
@@ -30,7 +32,9 @@ import { FormEditorComponent } from './form-editor/form-editor.component'
     MatCardModule ,
     MatIconModule,
     MatRadioModule,
-    HttpClientModule
+    MatSlideToggleModule,
+    HttpClientModule,
+    NotifierModule
   ],
   providers: [],
   bootstrap: [AppComponent]

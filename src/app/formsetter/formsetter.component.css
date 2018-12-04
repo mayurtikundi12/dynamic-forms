@@ -12,12 +12,14 @@ color: aliceblue
     display: block;
 }
 
-.question{
-    background-color: aquamarine ;
-    color: white ;
-    border-radius: 5px ;
-    border: 2px solid red ;
+.question-text{
+   display: inline-block;
+   padding: 0%; 
+   margin:0%;
+   margin-bottom: 1%;
+   font-size: 150%;
 }
+
 .multipleChoice{
     display: inline-block;
 }
@@ -28,9 +30,67 @@ color: aliceblue
 
 .deleteIcon{
     float: right;
+    margin-top: 0px;
 }
 .btn-save{
     margin-bottom: 2% ;
     float: right;
     margin-right: 4% ;
+}
+
+/* 
+.requiredLabel{
+    float: right;
+    display: inline-block;
+    padding-top: 0px ;
+    margin-left: 0px ;
+} */
+
+.verticalSeparator {
+    float: right;
+    background-color: red ;
+    height: 1rem;
+    margin-top: 1%;
+    /* width: 0.01% ; */
+    border-radius: 10% ;
+    padding: 0.9px;
+
+}
+
+#requiredInp{
+    display: inline-block;
+    /* float: right;    */
+}
+.pretty{
+    /* background-color: black; */
+    display: inline-block;
+    float: right;
+    margin-top: 0.5% ;
+}
+/* .extrasDiv{
+
+} */
+.dropdown-div{
+    width: 100%;
+}
+
+.question{
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+    border: 0px;
+}
+.gotError{
+    -webkit-box-shadow: 0px 1px 5px 0px rgba(242,24,38,1);
+-moz-box-shadow: 0px 1px 5px 0px rgba(242,24,38,1);
+box-shadow: 0px 1px 5px 0px rgba(242,24,38,1);
+}
+
+.errorText{
+    color: red;
+    font-size: 80% ;
+    display: block;
+    width: 200%;
+}
+
+.hideError{
+    display: none ;
 }

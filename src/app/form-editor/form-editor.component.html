@@ -7,8 +7,7 @@
 
 
 <div *ngIf='gotDataFlag' >
-   
-    <button id="btnAddQue" mat-raised-button color="primary" (click)="addQuestion()">Add Question</button>
+        <button id="btnAddQue" mat-raised-button color="primary" (click)="addQuestion()">Add Question</button>
     
     <label for="formTitle">Title</label>
     <mat-form-field>
@@ -21,9 +20,19 @@
 
     <form id="oldForm" [formGroup]='oldFormInfo'>
         <mat-card  id="Q-{{question.queNum}}"   [ngSwitch]='question.qType' *ngFor='let question of FormData.QuestionsArray' >
-          <i class="material-icons deleteIcon" id="delQ-{{question.queNum}}" (click)='deleteQueDiv(question.queNum)'> delete </i>
+                <div>
+            <i class="material-icons deleteIcon" id="delQ-{{question.queNum}}" (click)='deleteQueDiv(question.queNum)'> delete </i>
+            <div class="verticalSeparator"></div>           
+            <div class="pretty p-switch">
+                         <input id="Req-{{question.queNum}}" type="checkbox" />
+                        <div class="state p-primary">
+                            <label>Required</label>
+                        </div>
+                    </div>
+             </div>
              <mat-card-title>Question</mat-card-title>
-              <mat-form-field>
+             <mat-form-field>
+                <p id="ERROR-{{question.queNum}}" class="errorText hideError">please fill this field</p>
                 <input id='{{question.qNumber}}' value='{{question.question}}' type="text" name='question.qNumber' matInput>
             </mat-form-field>    
     <div *ngSwitchCase='"shortAnswer"' >
@@ -37,6 +46,7 @@
        
         <div *ngSwitchCase='"multipleChoice"' >
         <div *ngFor='let subQue of question.subQuestions; index as subQIndex' >
+            <p id="SUBERROR-{{question.queNum}}-{{subQIndex +1}}" class="errorText hideError">please fill this field</p>            
             <i class="material-icons"> radio_button_unchecked </i>
             <input id='SubQ-{{question.queNum}}-{{subQIndex +1}}' value='{{subQue}}' type="text" name='question.qNumber' matInput>            
             <i class="material-icons" (click)='removeOldFormOption($event,question.queNum)' >remove_circle_outline</i>
@@ -54,8 +64,9 @@
         </div>   
        <div   *ngSwitchCase='"checkbox"'>
              <div  *ngFor='let subQue of question.subQuestions; index as subQIndex' >
+                    <p id="SUBERROR-{{question.queNum}}-{{subQIndex +1}}" class="errorText hideError">please fill this field</p>                                
                     <i class="material-icons"> check_box_outline_blank</i>    
-                <input id='SubQ-{{question.queNum}}-{{subQIndex +1}}' matInput value="{{subQue}}" type="TEXT" name="SubQ-{{subQIndex}}" >                   
+                    <input id='SubQ-{{question.queNum}}-{{subQIndex +1}}' matInput value="{{subQue}}" type="TEXT" name="SubQ-{{subQIndex}}" >                   
                     <i class="material-icons" (click)='removeOldFormOption($event,question.queNum)' >remove_circle_outline</i>
                 </div>
                 <div>
@@ -65,8 +76,9 @@
        </div>
         <div  *ngSwitchCase='"dropdown"' >       
                 <div  *ngFor='let subQue of question.subQuestions; index as subQIndex' >   
+                    <p id="SUBERROR-{{question.queNum}}-{{subQIndex +1}}" class="errorText hideError">please fill this field</p>                               
                     <input id='SubQ-{{question.queNum}}-{{subQIndex +1}}' matInput value="{{subQue}}" type="TEXT" name="SubQ-{{subQIndex}}" >                   
-                        <i class="material-icons" (click)='removeOldFormOption($event,question.queNum)' >remove_circle_outline</i>
+                    <i class="material-icons" (click)='removeOldFormOption($event,question.queNum)' >remove_circle_outline</i>
                     </div>
                     <div>
                             <i class="material-icons" (click)="insertOldFormOption($event,'dropdown',question.queNum)">add_circle</i>

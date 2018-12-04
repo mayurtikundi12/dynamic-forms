@@ -17,4 +17,8 @@ export class BackConnectionService {
   getForm(formName){
     return this.http.get<any>('http://localhost:3000/form/get/'+formName)
   }
+
+  editForm(formDate){
+    return this.http.post<any>('http://localhost:3000/form/edit',formDate)
+  }
 }

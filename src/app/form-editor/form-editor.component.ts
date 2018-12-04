@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ElementRef, Renderer2 } from '@angular/core'
+import { ElementRef, Renderer2 } from '@angular/core';
 import { BackConnectionService } from '../services/back-connection.service'
 import swal from 'sweetalert2'
 import { FormControl, FormGroup } from '@angular/forms'
+import {Router} from '@angular/router'
+import {NotifierService} from 'angular-notifier'
 
 @Component({
   selector: 'app-form-editor',
@@ -11,7 +13,9 @@ import { FormControl, FormGroup } from '@angular/forms'
 })
 export class FormEditorComponent implements OnInit {
 
-  constructor(private renderer: Renderer2, private element: ElementRef, private formService: BackConnectionService) { }
+  constructor(private notifier:NotifierService, private renderer: Renderer2,
+     private element: ElementRef,private router:Router,
+     private formService: BackConnectionService) { }
 
   oldFormInfo = new FormGroup({
     formTitle: new FormControl('new form'),
@@ -41,10 +45,10 @@ export class FormEditorComponent implements OnInit {
         if (data.payload.response != null) {
           this.gotDataFlag = true;
           this.FormData = data.payload.response;
-
+          this.finalFormData.formId = this.FormData['_id']
           //setting the questions array 
           let oldQuestionArray = this.FormData['QuestionsArray'];
-
+          this.oldQuestionCount = oldQuestionArray.length ;
           //filling up the questions array with that of what we get from the backend
           // this.QuestionsArray = this.FormData['QuestionsArray'];
           for (let ref of data.payload.response.QuestionsArray) {
@@ -89,12 +93,13 @@ export class FormEditorComponent implements OnInit {
   questionInput = '';
   QuestionsArray = [];
   totalSubQuestionCount = {};
-
+  oldQuestionCount:number;
 
   finalFormData = {
     formTitle: '',
     formDescription: '',
     QuestionsArray: this.QuestionsArray,
+    formId:''
   }
 
   subQuestions: Object = {};
@@ -108,6 +113,7 @@ export class FormEditorComponent implements OnInit {
       qNumber: 'QDiv-' + count,
       qType: '',
       question: '',
+      required:'',
       subQuestions: []
     }
     //pushing the question object in the QuestionsArray
@@ -121,15 +127,36 @@ export class FormEditorComponent implements OnInit {
     let MainForm = this.element.nativeElement.querySelector('#Qform');
 
     //creating the Question div element
-    let QuestionDiv = this.createElementAndAddClass('div', ['question']);
+    let QuestionDiv = this.createElementAndAddClass('div',['question','card']) ;
+    
     //setting the id for the main question divion
     this.renderer.setAttribute(QuestionDiv, 'id', 'Q-' + this.questionCount)
     //creating the delete btn for deleting the question div
+    let extrasDiv = this.createElementAndAddClass('div',['extrasDiv']);
     let deletebtnIcon = this.createElementAndAddClass('mat-icon', ['material-icons', 'deleteIcon']);
     let deletebtnText = this.renderer.createText('delete');
     this.renderer.setAttribute(deletebtnIcon, 'id', 'delQ-' + this.questionCount)
     this.renderer.appendChild(deletebtnIcon, deletebtnText);
-    this.renderer.appendChild(QuestionDiv, deletebtnIcon);
+    this.renderer.appendChild(extrasDiv, deletebtnIcon);
+
+//creating the required toggle button functionality
+let checkBoxDiv = this.createElementAndAddClass('div',['pretty','p-switch']);
+let checkBoxInp = this.createElementAndAddClass('input',[]);
+this.renderer.setProperty(checkBoxInp,'type','checkbox');
+this.renderer.setProperty(checkBoxInp,'id','Req-'+this.questionCount)
+this.renderer.appendChild(checkBoxDiv,checkBoxInp);
+let innerCheckBoxDiv = this.createElementAndAddClass('div',['state','p-primary']) 
+let checkBoxLabel = this.createElementAndAddClass('label',[])
+let labelText = this.renderer.createText('Required');
+this.renderer.appendChild(checkBoxLabel,labelText)
+this.renderer.appendChild(innerCheckBoxDiv,checkBoxLabel);
+this.renderer.appendChild(checkBoxDiv,innerCheckBoxDiv)
+let verticalSeparator = this.createElementAndAddClass('div',['verticalSeparator'])
+this.renderer.appendChild(extrasDiv,verticalSeparator);        
+this.renderer.appendChild(extrasDiv,checkBoxDiv)
+
+this.renderer.appendChild(QuestionDiv,extrasDiv) ; 
+
 
     //deleting the question div functionality
     this.renderer.listen(deletebtnIcon, 'click', event => {
@@ -153,23 +180,28 @@ export class FormEditorComponent implements OnInit {
     })
 
     //creating the question field
-    let formField = this.createElementAndAddClass('mat-form-field', [])
-    let questionInput = this.createElementAndAddClass('input', ['formFields', 'mat-input-element', 'mat-form-field-autofill-control', 'cdk-text-field-autofill-monitored'])
-    let questionLabel = this.renderer.createText('Question ')
-    this.renderer.setAttribute(questionInput, 'placeholder', 'write your question here')
-    this.setQuestionId(questionInput)
-
-
+    let formField =  this.createElementAndAddClass('mat-form-field',[])
+    let questionInput = this.createElementAndAddClass('input',['formFields','mat-input-element','mat-form-field-autofill-control','cdk-text-field-autofill-monitored'])
+    let questionLabel = this.createElementAndAddClass('p',['card-title','question-text'])
+    let questionLabelText = this.renderer.createText('Question ');
+    let errorPara =  this.createError(`ERROR-${this.questionCount}`,"please fill this field")
+    this.renderer.appendChild(questionLabel,questionLabelText)
+    this.renderer.appendChild(questionLabel,errorPara)
+    this.renderer.setAttribute(questionInput,'placeholder','write your question here')
+    this.setQuestionId(questionInput) 
+    
 
 
     // creating the dropdown for selecting the type of question
-    let dropdownformField = this.createElementAndAddClass('mat-form-field', []);
+    let dropdownformField = this.createElementAndAddClass('mat-form-field',['dropdown-div','mat-form-field-wrapper','mat-form-field-flex','mat-form-field-infix']) ;
+    let dropdownError = this.createError(`DROPERROR-${this.questionCount}`,"please choose the question type")
+    this.renderer.appendChild(dropdownformField,dropdownError)
     let dropDownText = this.renderer.createText('choose the question type')
-    this.renderer.appendChild(dropdownformField, dropDownText)
+    this.renderer.appendChild(dropdownformField,dropDownText)
 
-    let dropdownSelect = this.createElementAndAddClass('select', []);
-    this.renderer.setAttribute(dropdownSelect, 'id', 'dropSelect-' + this.questionCount)
-
+    let dropdownSelect= this.createElementAndAddClass('select',[]) ;
+    this.renderer.setAttribute(dropdownSelect,'id','dropSelect-'+this.questionCount)
+  
     //listening to the click event on the dropdown to create respective ans elements  
     this.renderer.listen(dropdownSelect, 'click', event => {
       let questionNumberText = event.target.id;
@@ -435,6 +467,10 @@ export class FormEditorComponent implements OnInit {
     let removeOptionIconText = this.renderer.createText('remove_circle');
     this.renderer.appendChild(removeOptionIcon, removeOptionIconText);
     this.renderer.appendChild(multiChoiceDiv, removeOptionIcon);
+        
+    //creating the error text
+    let errorText = this.createError(`SUBERROR-${questionNumber}-${this.subQuestions[questionNumber]}`,"please fill this field")
+    this.renderer.appendChild(multiChoiceDiv,errorText) ; 
 
     //listening to the remove icon to remove the option
     this.renderer.listen(removeOptionIcon, 'click', event => {
@@ -468,10 +504,14 @@ export class FormEditorComponent implements OnInit {
       //assigning value as 1 for the totalSubQuestionCount for the first time
       this.totalSubQuestionCount[questionNumber] = 1;
     }
-    let dropDownDiv = this.createElementAndAddClass('div', ['material-icons']);
-    let dropdownInput = this.createElementAndAddClass('input', []);
+    let dropDownDiv = this.createElementAndAddClass('div', []);
+    let dropdownInput = this.createElementAndAddClass('input', ['multipleChoice']);
     this.renderer.setAttribute(dropdownInput, 'id', 'SubQ-' + questionNumber + '-' + this.subQuestions[questionNumber])
     this.renderer.setAttribute(dropdownInput, 'placeholder', 'option ' + this.subQuestions[questionNumber]);
+    //creating the error text
+    let errorText = this.createError(`SUBERROR-${questionNumber}-${this.subQuestions[questionNumber]}`,"please fill this field")
+    this.renderer.appendChild(dropDownDiv,errorText) ; 
+    
     this.renderer.appendChild(dropDownDiv, dropdownInput);
     this.renderer.insertBefore(parentNode, dropDownDiv, refrenceElement);
 
@@ -481,6 +521,11 @@ export class FormEditorComponent implements OnInit {
     let removeBtnText = this.renderer.createText('remove_circle');
     this.renderer.appendChild(removeBtn, removeBtnText);
     this.renderer.appendChild(dropDownDiv, removeBtn);
+
+
+    
+
+    //listening to the remove button to remove the dropdown option
     this.renderer.listen(removeBtn, 'click', event => {
       this.renderer.removeChild(parentNode, dropDownDiv);
       //decrementing the totalSubQuestionCount value as the input is removed
@@ -509,37 +554,87 @@ export class FormEditorComponent implements OnInit {
     return element;
   }
 
+  //this will create the error paragraph 
+  createError(questionNumber,text){
+    let errorPara = this.createElementAndAddClass('p',['errorText','hideError']);
+    let errorText = this.renderer.createText(text);
+    this.renderer.setAttribute(errorPara,'id',questionNumber)
+    this.renderer.appendChild(errorPara,errorText)
+    return errorPara;
+  }
 
   saveForm() {
+    this.notifier.hideAll();
+    let isFormValid:Boolean = false ;
+
+    let requiredField;
+    let mainQuestion;
+
+
     //setting the form title and the form description in the finalFormData
     let formTitle = this.element.nativeElement.querySelector('#formTitle')
     let formDescription = this.element.nativeElement.querySelector('#formDescription')
-    this.finalFormData['formTitle'] = formTitle.value;
-    this.finalFormData['formDescription'] = formDescription.value;
-    let mainQuestion;
- 
-    for (const index in this.QuestionsArray) {
+
+    //checking if we have the form title and the form discription
+
+    if(formTitle.value && formDescription.value && formTitle.value!=" " && formDescription.value!=" " ){
+
+      //setting the form title and form description
+      this.finalFormData['formTitle'] = formTitle.value;
+      this.finalFormData['formDescription'] = formDescription.value;
+   
+      
+      if(this.QuestionsArray.length>0){
+        for (const index in this.QuestionsArray) {
           //making the subQuestions empty first to avoid sub questions duplication
           this.QuestionsArray[index]['subQuestions'] = []
       let currentQuestion = this.QuestionsArray[index];
+          //getting the question number from the question id by doing some string manipukation
+          let questionNumberText = currentQuestion['qNumber'] ; 
+          let questionNumber = Number(questionNumberText.substring(5,questionNumberText.length))
+     
       mainQuestion = this.element.nativeElement.querySelector('#' + this.QuestionsArray[index]['qNumber']);
       currentQuestion['question'] = mainQuestion.value
+      
+      //checking whether the question is required or not by getting the required toggle input
+      requiredField = this.element.nativeElement.querySelector('#Req-'+questionNumber).checked
+      // if required field is checked we will get true else we get false
+      requiredField?currentQuestion['required']=true:currentQuestion['required']=false ;
+      let errorText =   this.element.nativeElement.querySelector('#ERROR-'+questionNumber)
+   
+      //getting the qustion number div and setting gotError class 
+      let qDiv = this.element.nativeElement.querySelector('#Q-'+questionNumber);
+       
+      //checking if any dropdown option is selected or not
+          if(mainQuestion.value){
+            this.renderer.removeClass(qDiv,'gotError')
+            this.renderer.addClass(errorText,'hideError')
+
+       //getting the dropdown error text and removing its class if it is a new question
+       let dropError;
+       if(questionNumber>this.oldQuestionCount){
+        dropError = this.element.nativeElement.querySelector('#DROPERROR-'+questionNumber)
+       } 
+      
+      
+       //checking if any dropdown option is selected or not
+       if(currentQuestion['qType']){
+        questionNumber>this.oldQuestionCount?this.renderer.addClass(dropError,'hideError'):console.log("");//this will hide the error text is everything is fine
+              
       //now check the type and if the type is checkbox,dropdown or multiple choice then get the question to 
       if (currentQuestion['qType'] == 'checkbox' || currentQuestion['qType'] == 'dropdown' || currentQuestion['qType'] == 'multipleChoice') {
         //now iterating the for loop and getting the subquestion value from the subQuestion inputs
-        //while loop on the subQuestions limit
-
+  
         let questionNumberText = currentQuestion['qNumber'];
-
+  
         let questionNumber = Number(questionNumberText.substring(5, questionNumberText.length))
-
+  
         if (questionNumber != NaN) {
           let subQueLimit = 1;
           let subQueNumber = 1;
-  console.log("this is subQuesyion ===>", Number(this.subQuestions[questionNumber]));
-  
+
+        //while loop on the subQuestions limit  
           while (subQueLimit <= Number(this.subQuestions[questionNumber]) && subQueNumber<=Number(this.subQuestions[questionNumber])) {
-           
             // now creating the id of the subquestions 
             let subQuestionNumber = '#SubQ-' + questionNumber + '-' + subQueNumber;
             //now getting the element
@@ -550,29 +645,71 @@ export class FormEditorComponent implements OnInit {
             if (subQueElementInp != null && subQueElementInp) {  
              console.log('i am inside true condition');
               subQueLimit++;
+                           //getting the error text message for the sub question input field
+             let subErrorText = this.element.nativeElement.querySelector('#SUBERROR-'+questionNumber+'-'+subQueNumber)
+             //checking if subquestion input contains some valid input value
+             if(subQueElementInp.value){
+              this.renderer.addClass(subErrorText,'hideError')
               this.QuestionsArray[index]['subQuestions'].push(subQueElementInp.value)
-            }else{
-              console.log('it was null');
-              // subQueLimit++;  
+             }else{ 
+              this.renderer.removeClass(subErrorText,'hideError')
+              this.renderer.setAttribute(qDiv,'class','gotError')
+              // this.notifier.notify( 'error', 'please fill all questions properly' );  
+             }
             }
             subQueNumber++;
           }
         } else {
           console.log("definitely there is some peoblem in the question number");
         }
-
+  
       }
+      }else{
+              // tell to select dropdown class
+              this.renderer.removeClass(dropError,'hideError')
+              //highlight the wrong question division
+              this.renderer.setAttribute(qDiv,'class','gotError')
+      }
+          }else{
+            this.renderer.setAttribute(qDiv,'class','gotError')
+            //getting the error text and showing it
+            this.renderer.removeClass(errorText,'hideError')
+      
+          }
     }
-    console.log("this is the subquestions",this.subQuestions);
-    console.log("this is the totalSubquestionCount",this.totalSubQuestionCount);
-   
-    this.finalFormData['QuestionsArray'] = this.QuestionsArray;
-    console.log(this.finalFormData);
+      }else{
+        this.notifier.notify( 'error', 'you need to add atleast one question' );
+      }
+    }else{
+    // show error of the field not filled
+    this.notifier.notify( 'error', 'please give this form a Title and a Description' );      
+  
+    }
 
+    this.finalFormData['QuestionsArray'] = this.QuestionsArray;
+    
+
+// checking if the form is valid if valid or not
+    if(isFormValid){
+      console.log(this.finalFormData);
     // sending and saving the file in the database
-    // this.formService.setForm({ formData: this.finalFormData }).subscribe(data => {
-    //   console.log(data);
-    // });
+    this.formService.editForm({ formData: this.finalFormData }).subscribe(data => {
+      console.log(data);
+      if(data.payload.sucessflag){
+        swal({
+          position: 'top-end',
+          type: 'success',
+          title: 'Your work has been saved',
+          showConfirmButton: false,
+          timer: 1500
+        })
+        // this.router.navigate(['/formeditor'])        
+        window.location.reload()
+      }
+    });
+    }else{
+      this.notifier.notify( 'error', 'form is not valid' );
+    }
     
   }
 
@@ -582,10 +719,11 @@ export class FormEditorComponent implements OnInit {
 
   //deleting the existing question divs
   deleteQueDiv(qnum){
-    
+    //reducing the old question count
+    this.oldQuestionCount--
     //first getting the id then getting the main element + getting the question div
     let oldForm = this.element.nativeElement.querySelector('#oldForm');
-    let questionDivText = '#Q-'+qnum
+    let questionDivText:String = '#Q-'+qnum
     let questionDiv = this.element.nativeElement.querySelector(questionDivText)
 
     //removing the question from the questions array

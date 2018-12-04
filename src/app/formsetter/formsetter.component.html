@@ -7,10 +7,10 @@
 <div> 
 <form id="Qform" [formGroup]='formInfo' >
     <mat-form-field>
-        <input matInput  placeholder="Form Title" type="text" name="formTitle" id="formTitle"> 
+        <input matInput required  placeholder="Form Title" type="text" name="formTitle" id="formTitle"> 
     </mat-form-field>
     <mat-form-field>
-        <input matInput  placeholder="Form Description" type="text" name="formDescription" id="formDescription"> 
+        <input matInput required placeholder="Form Description" type="text" name="formDescription" id="formDescription"> 
     </mat-form-field>
 
 </form>
@@ -18,3 +18,5 @@
 
 
 <button mat-raised-button color="accent" class='btn-save' (click)='saveForm()' >Save Form</button>
+
+<notifier-container></notifier-container>
